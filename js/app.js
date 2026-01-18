@@ -54,6 +54,7 @@ class TimeBlockPlannerApp {
         document.getElementById('currentDate')?.addEventListener('change', (e) => {
             this.currentDate = new Date(e.target.value + 'T00:00:00');
             this.renderDailyView();
+            this.importGoogleCalendarEvents();
         });
 
         // Week navigation
@@ -872,6 +873,7 @@ class TimeBlockPlannerApp {
     navigateDay(delta) {
         this.currentDate.setDate(this.currentDate.getDate() + delta);
         this.renderDailyView();
+        this.importGoogleCalendarEvents();
     }
 
     navigateWeek(delta) {
@@ -887,6 +889,7 @@ class TimeBlockPlannerApp {
     goToToday() {
         this.currentDate = new Date();
         this.renderDailyView();
+        this.importGoogleCalendarEvents();
     }
 
     goToThisWeek() {
@@ -1127,6 +1130,17 @@ class TimeBlockPlannerApp {
             case '?':
                 this.showHelp();
                 break;
+        }
+    }
+
+    // ============================================
+    // Google Calendar Integration
+    // ============================================
+
+    importGoogleCalendarEvents() {
+        // Call Google Calendar import if connected
+        if (window.GoogleCalendarIntegration && typeof window.GoogleCalendarIntegration.importEvents === 'function') {
+            window.GoogleCalendarIntegration.importEvents();
         }
     }
 
