@@ -1366,14 +1366,17 @@ aria-hidden="true"
                 if (tokenResponse && tokenResponse.access_token) {
                     accessToken = tokenResponse.access_token;
                     const expiryTime = Date.now() + (tokenResponse.expires_in * 1000);
-                    
+
+                    // Set token on GAPI client for authenticated API calls
+                    gapi.client.setToken({ access_token: accessToken });
+
                     localStorage.setItem('gcal_access_token', accessToken);
                     localStorage.setItem('gcal_token_expiry', expiryTime);
                     localStorage.setItem('gcal_token_issued', Date.now());
                     localStorage.setItem('gcal_connected', 'true');
-                    
+
                     log('Access token obtained and stored', 'info', { expiresIn: tokenResponse.expires_in });
-                    
+
                     updateConnectionStatus();
                     loadCalendarList();
                     showSuccess('Successfully connected to Google Calendar!');
@@ -1422,6 +1425,8 @@ aria-hidden="true"
                         // Load calendar list when restoring existing connection (wait for API to be ready)
                         const waitForApiAndLoadCalendars = () => {
                             if (gapiInited) {
+                                // Set token on GAPI client for authenticated API calls
+                                gapi.client.setToken({ access_token: accessToken });
                                 loadCalendarList();
                             } else {
                                 setTimeout(waitForApiAndLoadCalendars, 200);
