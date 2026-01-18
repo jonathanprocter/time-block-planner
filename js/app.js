@@ -277,12 +277,12 @@ class TimeBlockPlannerApp {
             this.state.settings.workingHoursStart,
             this.state.settings.workingHoursEnd
         );
-        
+
         dayData.timeBlocks.forEach(block => {
             const blockEl = document.createElement('div');
             blockEl.className = `time-block ${block.type}`;
             blockEl.dataset.blockId = block.id;
-            
+
             if (block.completed) {
                 blockEl.classList.add('completed');
             }
@@ -292,24 +292,62 @@ class TimeBlockPlannerApp {
             if (this.selectedBlock === block.id) {
                 blockEl.classList.add('selected');
             }
-            
+
             const { top, height } = generator.calculateBlockPosition(block.startTime, block.endTime);
             blockEl.style.top = `${top}px`;
             blockEl.style.height = `${height}px`;
-            
+
             blockEl.innerHTML = `
                 <div class="block-title">${this.escapeHtml(block.title)}</div>
                 <div class="block-time">${block.startTime} - ${block.endTime}</div>
             `;
-            
+
             blockEl.addEventListener('click', () => this.editBlock(block.id));
-            
+
             // Find the appropriate cell to append to
             const cells = container.querySelectorAll('.time-cell');
-            const columnCells = Array.from(cells).filter(cell => 
+            const columnCells = Array.from(cells).filter(cell =>
                 parseInt(cell.dataset.column) === block.column
             );
-            
+
+            if (columnCells.length > 0) {
+                columnCells[0].style.position = 'relative';
+                columnCells[0].appendChild(blockEl);
+            }
+        });
+
+        // Render Google Calendar events
+        this.renderGoogleCalendarEvents(container, generator);
+    }
+
+    renderGoogleCalendarEvents(container, generator) {
+        const TBP = getTBP();
+        const dateStr = TBP.formatDate(this.currentDate);
+        const gcalEvents = JSON.parse(localStorage.getItem('gcal_events_' + dateStr) || '[]');
+        const showEvents = document.getElementById('gcalShowEvents')?.checked !== false;
+
+        if (!showEvents || gcalEvents.length === 0) return;
+
+        gcalEvents.forEach(event => {
+            const blockEl = document.createElement('div');
+            blockEl.className = 'time-block gcal-event';
+            blockEl.dataset.gcalId = event.googleEventId;
+
+            const { top, height } = generator.calculateBlockPosition(event.startTime, event.endTime);
+            blockEl.style.top = `${top}px`;
+            blockEl.style.height = `${Math.max(height, 25)}px`;
+
+            blockEl.innerHTML = `
+                <div class="block-title">${this.escapeHtml(event.title)}</div>
+                <div class="block-time">${event.startTime} - ${event.endTime}</div>
+            `;
+
+            // Find the first column cell to append to
+            const cells = container.querySelectorAll('.time-cell');
+            const columnCells = Array.from(cells).filter(cell =>
+                parseInt(cell.dataset.column) === 0
+            );
+
             if (columnCells.length > 0) {
                 columnCells[0].style.position = 'relative';
                 columnCells[0].appendChild(blockEl);
@@ -1164,4 +1202,15 @@ let app;
 document.addEventListener('DOMContentLoaded', () => {
     app = new TimeBlockPlannerApp();
     window.app = app; // Make available globally for inline event handlers
+
+    // Expose refresh function for Google Calendar integration
+    window.refreshTimeBlockGrid = () => {
+        if (app && app.currentView === 'daily') {
+            app.renderDailyView();
+        } else if (app && app.currentView === 'weekly') {
+            app.renderWeeklyView();
+        } else if (app && app.currentView === 'monthly') {
+            app.renderMonthlyView();
+        }
+    };
 });

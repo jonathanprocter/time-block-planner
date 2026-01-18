@@ -573,6 +573,18 @@ body {
     border: 2px dashed var(--dividers);
 }
 
+.time-block.gcal-event {
+    background-color: #4285f4;
+    color: white;
+    border-left: 4px solid #1a73e8;
+    opacity: 0.9;
+}
+
+.time-block.gcal-event:hover {
+    opacity: 1;
+    background-color: #3367d6;
+}
+
 .block-title {
     font-weight: var(--font-semibold);
     margin-bottom: var(--space-1);
