@@ -1419,6 +1419,8 @@ aria-hidden="true"
                     if (tokenExpiry > Date.now()) {
                         accessToken = localStorage.getItem('gcal_access_token');
                         log('Existing valid token loaded');
+                        // Load calendar list when restoring existing connection
+                        setTimeout(() => loadCalendarList(), 500);
                     } else {
                         // Token expired
                         log('Token expired, clearing connection', 'warn');
