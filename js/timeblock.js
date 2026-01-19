@@ -591,10 +591,17 @@ class TimeGridGenerator {
         const blockStart = timeToMinutes(startTime);
         const blockEnd = timeToMinutes(endTime);
 
-        // Grid has 30-minute slots, each 60px tall = 120px per hour
-        const pixelsPerHour = 120;
-        const top = ((blockStart - gridStart) / 60) * pixelsPerHour;
-        const height = ((blockEnd - blockStart) / 60) * pixelsPerHour;
+        // Grid has 30-minute slots, each 60px tall + 1px gap = 61px per slot = 122px per hour
+        const slotHeight = 60;
+        const gridGap = 1;
+        const pixelsPerSlot = slotHeight + gridGap;
+
+        // Calculate slot positions (each slot is 30 minutes)
+        const startSlots = (blockStart - gridStart) / 30;
+        const durationSlots = (blockEnd - blockStart) / 30;
+
+        const top = startSlots * pixelsPerSlot;
+        const height = durationSlots * pixelsPerSlot;
 
         return { top, height };
     }
