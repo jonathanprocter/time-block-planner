@@ -1132,8 +1132,8 @@ aria-hidden="true"
     </div>
 
     <!-- Scripts -->
-    <script src="./js/timeblock.js?v=20260119b"></script>
-    <script src="./js/app.js?v=20260119b"></script>
+    <script src="./js/timeblock.js?v=20260119c"></script>
+    <script src="./js/app.js?v=20260119c"></script>
     <!-- Google Calendar Integration Script -->
     <script>
         (function() {
@@ -2074,10 +2074,9 @@ aria-hidden="true"
                 showLoadingState('Importing events from Google Calendar...');
                 
                 try {
-                    const timeMin = new Date(currentDate);
-                    timeMin.setHours(0, 0, 0, 0);
-                    const timeMax = new Date(currentDate);
-                    timeMax.setHours(23, 59, 59, 999);
+                    // Use 'T00:00:00' suffix to ensure local time parsing (not UTC)
+                    const timeMin = new Date(currentDate + 'T00:00:00');
+                    const timeMax = new Date(currentDate + 'T23:59:59');
                     
                     const response = await gapi.client.calendar.events.list({
                         calendarId: calendarId,
